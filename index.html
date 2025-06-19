@@ -40,6 +40,12 @@
     canvas.height = window.innerHeight;
 
     const knifeCursor = document.getElementById('knifeCursor');
+    const sliceSound = new Audio('images/success.mp3');
+
+    function playSliceSound() {
+        const sound = sliceSound.cloneNode();
+        sound.play();
+    }
 
     let fruits = [];
     let score = 0;
@@ -131,6 +137,7 @@
           const dy = fruit.y - mouseTrail[i].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < fruit.radius) {
+            playSliceSound()            
             fruit.sliced = true;
             score++;
             updateScoreboard();
