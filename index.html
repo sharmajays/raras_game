@@ -75,7 +75,7 @@
                 loadedImages++;
                 if (loadedImages === fruitTypes.length) {
                     // Start game when all images are ready
-                    setInterval(spawnFruit, 1000);
+                    setInterval(spawnFruit, 1600);
                     animate();
                 }
             };
@@ -91,7 +91,7 @@
                 this.y = y;
                 this.vx = vx;
                 this.vy = vy;
-                this.gravity = 0.5;
+                this.gravity = 0.2;
                 this.sliced = false;
                 this.flickerFrame = 0
 
