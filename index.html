@@ -58,7 +58,6 @@
             if (!audioUnlocked) {
                 sliceSound.play().catch(() => { }); // unlock silently
                 audioUnlocked = true;
-                alert("yes")
                 document.removeEventListener('click', unlockAudio);
                 document.removeEventListener('touchstart', unlockAudio);
             }
@@ -69,7 +68,6 @@
 
         // When slicing:
         function playSliceSound() {
-            console.log("I WAS HERE, ",audioUnlocked)
             if (audioUnlocked) {
                 const sound = sliceSound.cloneNode();
                 sound.play().then(()=>console.log("played")).catch((err) => { 
