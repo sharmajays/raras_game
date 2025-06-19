@@ -33,7 +33,6 @@
 
 <body>
     <canvas id="game"></canvas>
-    <p>hello</p>
     <div id="scoreboard">Score: 0 | Lives: 100</div>
     <img id="knifeCursor" src="images/cur.png" style="
         position: absolute;
@@ -51,15 +50,6 @@
         canvas.height = window.innerHeight;
 
         const knifeCursor = document.getElementById("knifeCursor");
-        const sliceSound = new Audio("images/success.mp3");
-
-        // When slicing:
-        function playSliceSound() {
-            const sound = sliceSound.cloneNode();
-            sound.play().catch((err) => {
-                alert(err)
-            }); // avoid future promise rejections
-        }
 
         let fruits = [];
         let score = 0;
@@ -159,6 +149,9 @@
                     if (dist < fruit.radius) {
                         fruit.sliced = true;
                         score++;
+                        if (navigator.vibrate) {
+                            navigator.vibrate(100);
+                        }
                         updateScoreboard();
                         break;
                     }
@@ -239,8 +232,6 @@
                 if (touch) {
                     trackMovement(touch.clientX, touch.clientY);
                     updateKnifeCursor(touch.clientX, touch.clientY);
-                    playSliceSound()
-
                 }
                 e.preventDefault();
             },
