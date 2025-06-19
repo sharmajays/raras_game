@@ -63,7 +63,7 @@
         const knifeCursor = document.getElementById("knifeCursor");
 
         let startimg = 25
-        let speedo = 2.5
+        let speedo = 3
 
         let fruits = [];
         let score = 0;
@@ -292,10 +292,10 @@
             const type = fruitTypes[startimg];
             if(startimg==0){
                 startimg = 25
-                speedo = speedo + 1.5
+                speedo = speedo + 1
             }
             else{
-                startimg = startimg - 1.5
+                startimg = startimg - 1
             }
             const x = Math.random() * (canvas.width - 100) + 50;
             const y = canvas.height + 50;
