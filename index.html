@@ -151,7 +151,7 @@
 
     function drawMouseTrail() {
       ctx.beginPath();
-      const trailWidth = window.innerWidth < 768 ? 6 : 3;
+      const trailWidth = window.innerWidth < 768 ? 6 : 1;
       ctx.lineWidth = trailWidth;
       ctx.strokeStyle = 'white';
       for (let i = 0; i < mouseTrail.length - 1; i++) {
