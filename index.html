@@ -2,17 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Fruit Cut Game</title>
+  <title>Happy Bday Raras</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       margin: 0;
       overflow: hidden;
       background: #111;
+      cursor: url('images/cur.png'), auto !important;
+
     }
     canvas {
       display: block;
       background: #222;
+      cursor: url('images/cur.png'), auto !important;
     }
     #scoreboard {
       position: absolute;
@@ -27,7 +30,8 @@
 </head>
 <body>
   <canvas id="game"></canvas>
-  <div id="scoreboard">Score: 0 | Lives: 3</div>
+  <p>hello</p>
+  <div id="scoreboard">Score: 0 | Lives: 100 </div>
 
   <script>
     const canvas = document.getElementById('game');
@@ -37,7 +41,7 @@
 
     let fruits = [];
     let score = 0;
-    let lives = 3;
+    let lives = 50;
     let mouseTrail = [];
 
     const fruitTypes = [
