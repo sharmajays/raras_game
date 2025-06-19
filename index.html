@@ -20,7 +20,7 @@
 
         #scoreboard {
             position: absolute;
-            color: rgb(201, 61, 201);
+            color: rgb(185, 30, 185);
             font-family: Arial, sans-serif;
             font-size: calc(16px + 1.5vw);
             /* Responsive font */
@@ -93,6 +93,7 @@
                 this.vy = vy;
                 this.gravity = 0.3;
                 this.sliced = false;
+                this.flickerFrame = 0
 
                 // Scale based on screen size
                 const scale = window.innerWidth < 768 ? 1.5 : 1;
@@ -120,26 +121,51 @@
             //     ctx.globalAlpha = 1;
             // }
 
+            // draw() {
+            //     if (!this.image.complete) return;
+
+            //     const x = this.x - this.width / 2;
+            //     const y = this.y - this.height / 2;
+
+            //     if (this.sliced) {
+            //         // Draw normal image
+            //         ctx.drawImage(this.image, x, y, this.width, this.height);
+
+            //         // Apply red tint
+            //         ctx.globalCompositeOperation = 'source-atop';
+            //         ctx.fillStyle = 'rgba(185, 30, 185, 0.5)'; // red overlay
+            //         ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+            //         ctx.fillRect(x, y, this.width, this.height);
+            //         ctx.globalCompositeOperation = 'source-over';
+            //     } else {
+            //         // Normal image
+            //         ctx.drawImage(this.image, x, y, this.width, this.height);
+            //     }
+            // }
+
             draw() {
                 if (!this.image.complete) return;
 
                 const x = this.x - this.width / 2;
                 const y = this.y - this.height / 2;
 
-                if (this.sliced) {
-                    // Draw normal image
-                    ctx.drawImage(this.image, x, y, this.width, this.height);
+                // Always draw the fruit image
+                ctx.drawImage(this.image, x, y, this.width, this.height);
 
-                    // Apply red tint
-                    ctx.globalCompositeOperation = 'source-atop';
-                    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; // red overlay
-                    ctx.fillRect(x, y, this.width, this.height);
-                    ctx.globalCompositeOperation = 'source-over';
-                } else {
-                    // Normal image
-                    ctx.drawImage(this.image, x, y, this.width, this.height);
+                    // If sliced, overlay flickering tint
+                    if (this.sliced) {
+                        this.flickerFrame++;
+
+                        // Alternate between red and purple
+                        const isRed = this.flickerFrame % 10 < 5;
+                        const color = isRed ? 'rgba(255, 0, 0, 0.5)' : 'rgba(128, 0, 128, 0.5)';
+
+                        ctx.globalCompositeOperation = 'source-atop';
+                        ctx.fillStyle = color;
+                        ctx.fillRect(x, y, this.width, this.height);
+                        ctx.globalCompositeOperation = 'source-over';
+                    }
                 }
-            }
 
 
             isOffScreen() {
