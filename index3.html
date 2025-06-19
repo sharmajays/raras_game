@@ -1,34 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Fruit Cut Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fruit Cut Game with Images</title>
   <style>
     body {
       margin: 0;
       overflow: hidden;
       background: #111;
     }
+
     canvas {
       display: block;
       background: #222;
     }
+
     #scoreboard {
       position: absolute;
       color: white;
       font-family: Arial, sans-serif;
-      font-size: calc(16px + 1.5vw); /* Responsive font */
+      font-size: 18px;
       top: 10px;
       left: 10px;
-      z-index: 10;
     }
   </style>
 </head>
+
 <body>
   <canvas id="game"></canvas>
   <div id="scoreboard">Score: 0 | Lives: 3</div>
-
   <script>
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
@@ -48,21 +49,11 @@
       { name: 'pineapple', src: 'images/a5.webp' }
     ];
 
+    // Preload fruit images
     const fruitImages = {};
-    let loadedImages = 0;
-
     fruitTypes.forEach(fruit => {
       const img = new Image();
       img.src = fruit.src;
-      img.onload = () => {
-        loadedImages++;
-        if (loadedImages === fruitTypes.length) {
-          // Start game when all images are ready
-          setInterval(spawnFruit, 1000);
-          animate();
-        }
-      };
-      img.onerror = () => console.error(`Failed to load image: ${fruit.src}`);
       fruitImages[fruit.name] = img;
     });
 
@@ -75,13 +66,10 @@
         this.vx = vx;
         this.vy = vy;
         this.gravity = 0.5;
+        this.radius = 40;
         this.sliced = false;
-
-        // Scale based on screen size
-        const scale = window.innerWidth < 768 ? 1.5 : 1;
-        this.width = 60 * scale;
-        this.height = 60 * scale;
-        this.radius = 40 * scale;
+        this.width = 60;
+        this.height = 60;
       }
 
       update() {
@@ -91,10 +79,13 @@
       }
 
       draw() {
-        if (!this.image.complete) return;
-        ctx.globalAlpha = this.sliced ? 0.5 : 1;
-        ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-        ctx.globalAlpha = 1;
+        if (!this.sliced && this.image.complete) {
+          ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        } else if (this.sliced) {
+          ctx.globalAlpha = 0.5;
+          ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+          ctx.globalAlpha = 1;
+        }
       }
 
       isOffScreen() {
@@ -112,13 +103,15 @@
     }
 
     function detectSlice() {
-      for (let fruit of fruits) {
+      for (let i = 0; i < fruits.length; i++) {
+        const fruit = fruits[i];
         if (fruit.sliced) continue;
-        for (let i = 0; i < mouseTrail.length - 1; i++) {
-          const dx = fruit.x - mouseTrail[i].x;
-          const dy = fruit.y - mouseTrail[i].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < fruit.radius) {
+
+        for (let j = 0; j < mouseTrail.length - 1; j++) {
+          const dx = fruit.x - mouseTrail[j].x;
+          const dy = fruit.y - mouseTrail[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < fruit.radius) {
             fruit.sliced = true;
             score++;
             updateScoreboard();
@@ -139,12 +132,13 @@
 
     function drawMouseTrail() {
       ctx.beginPath();
-      const trailWidth = window.innerWidth < 768 ? 6 : 3;
-      ctx.lineWidth = trailWidth;
-      ctx.strokeStyle = 'white';
       for (let i = 0; i < mouseTrail.length - 1; i++) {
-        ctx.moveTo(mouseTrail[i].x, mouseTrail[i].y);
-        ctx.lineTo(mouseTrail[i + 1].x, mouseTrail[i + 1].y);
+        const p1 = mouseTrail[i];
+        const p2 = mouseTrail[i + 1];
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
       }
       ctx.stroke();
     }
@@ -173,6 +167,7 @@
       requestAnimationFrame(animate);
     }
 
+    // 🧠 Universal tracking for both mouse and touch
     function trackMovement(x, y) {
       mouseTrail.push({ x, y });
       if (mouseTrail.length > 10) mouseTrail.shift();
@@ -182,23 +177,28 @@
     canvas.addEventListener('mousemove', e => {
       trackMovement(e.clientX, e.clientY);
     });
-
     canvas.addEventListener('mouseleave', () => {
       mouseTrail = [];
     });
 
-    // Touch support
+    // Mobile touch support
     canvas.addEventListener('touchmove', e => {
       const touch = e.touches[0];
       if (touch) {
         trackMovement(touch.clientX, touch.clientY);
       }
-      e.preventDefault();
+      e.preventDefault(); // stop page scroll
     }, { passive: false });
 
     canvas.addEventListener('touchend', () => {
       mouseTrail = [];
     });
+
+    // Start game
+    setInterval(spawnFruit, 1000);
+    animate();
   </script>
+
 </body>
+
 </html>
