@@ -15,7 +15,7 @@
     canvas {
       display: block;
       background: #222;
-      cursor: url('images/cur.png'), auto !important;
+      cursor: none;
     }
     #scoreboard {
       position: absolute;
@@ -32,12 +32,16 @@
   <canvas id="game"></canvas>
   <p>hello</p>
   <div id="scoreboard">Score: 0 | Lives: 100 </div>
+  <img id="knifeCursor" src="images/cur.png" style="position:absolute; width:40px; height:40px; pointer-events:none; display:none; z-index:999;" />
+
 
   <script>
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    const knifeCursor = document.getElementById('knifeCursor');
 
     let fruits = [];
     let score = 0;
@@ -104,6 +108,12 @@
       isOffScreen() {
         return this.y - this.height > canvas.height;
       }
+    }
+
+    function updateKnifeCursor(x, y) {
+        knifeCursor.style.left = `${x - 20}px`;
+        knifeCursor.style.top = `${y - 20}px`;
+        knifeCursor.style.display = 'block';
     }
 
     function spawnFruit() {
@@ -185,10 +195,12 @@
     // Mouse support
     canvas.addEventListener('mousemove', e => {
       trackMovement(e.clientX, e.clientY);
+      updateKnifeCursor(e.clientX, e.clientY);
     });
 
     canvas.addEventListener('mouseleave', () => {
       mouseTrail = [];
+      knifeCursor.style.display = 'none';
     });
 
     // Touch support
@@ -196,13 +208,16 @@
       const touch = e.touches[0];
       if (touch) {
         trackMovement(touch.clientX, touch.clientY);
+        updateKnifeCursor(touch.clientX, touch.clientY);
       }
       e.preventDefault();
     }, { passive: false });
 
     canvas.addEventListener('touchend', () => {
       mouseTrail = [];
+      knifeCursor.style.display = 'none';
     });
+
   </script>
 </body>
 </html>
