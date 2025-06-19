@@ -52,28 +52,13 @@
 
         const knifeCursor = document.getElementById("knifeCursor");
         const sliceSound = new Audio("images/success.mp3");
-        let audioUnlocked = false;
-
-        function unlockAudio() {
-            if (!audioUnlocked) {
-                sliceSound.play().catch(() => { }); // unlock silently
-                audioUnlocked = true;
-                document.removeEventListener('click', unlockAudio);
-                document.removeEventListener('touchstart', unlockAudio);
-            }
-        }
-
-        document.addEventListener('click', unlockAudio);
-        document.addEventListener('touchstart', unlockAudio);
 
         // When slicing:
         function playSliceSound() {
-            if (audioUnlocked) {
-                const sound = sliceSound.cloneNode();
-                sound.play().then(()=>console.log("played")).catch((err) => { 
-                    alert(err)
-                }); // avoid future promise rejections
-            }
+            const sound = sliceSound.cloneNode();
+            sound.play().catch((err) => {
+                alert(err)
+            }); // avoid future promise rejections
         }
 
         let fruits = [];
@@ -173,7 +158,6 @@
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < fruit.radius) {
                         fruit.sliced = true;
-                        playSliceSound()
                         score++;
                         updateScoreboard();
                         break;
@@ -255,6 +239,8 @@
                 if (touch) {
                     trackMovement(touch.clientX, touch.clientY);
                     updateKnifeCursor(touch.clientX, touch.clientY);
+                    playSliceSound()
+
                 }
                 e.preventDefault();
             },
