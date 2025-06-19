@@ -90,7 +90,7 @@
                 this.y = y;
                 this.vx = vx;
                 this.vy = vy;
-                this.gravity = 0.5;
+                this.gravity = 0.3;
                 this.sliced = false;
 
                 // Scale based on screen size
@@ -134,8 +134,8 @@
             const type = fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
             const x = Math.random() * (canvas.width - 100) + 50;
             const y = canvas.height + 50;
-            const vx = (Math.random() - 0.5) * 10;
-            const vy = -15 - Math.random() * 10;
+            const vx = (Math.random() - 0.5) * 6;
+            const vy = -15 - Math.random() * 6;
             fruits.push(new Fruit(type.name, x, y, vx, vy));
         }
 
