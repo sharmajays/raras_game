@@ -62,7 +62,8 @@
 
         const knifeCursor = document.getElementById("knifeCursor");
 
-        let startimg = 0
+        let startimg = 25
+        let speedo = 2
 
         let fruits = [];
         let score = 0;
@@ -289,16 +290,17 @@
 
         function spawnFruit() {
             const type = fruitTypes[startimg];
-            if(startimg==25){
-                startimg = 0
+            if(startimg==0){
+                startimg = 25
+                speedo = speedo + 0.5
             }
             else{
-                startimg = startimg + 1
+                startimg = startimg - 1
             }
             const x = Math.random() * (canvas.width - 100) + 50;
             const y = canvas.height + 50;
-            const vx = (Math.random() - 0.5) * 2;
-            const vy = -15 - Math.random() * 2;
+            const vx = (Math.random() - 0.5) * speedo;
+            const vy = -15 - Math.random() * speedo;
             fruits.push(new Fruit(type.name, x, y, vx, vy));
         }
 
