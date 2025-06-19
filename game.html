@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Fruit Cut Game with Images</title>
+  <title>Fruit Cut Game</title>
   <style>
     body { margin: 0; overflow: hidden; background: #111; }
     canvas { display: block; background: #222; }
@@ -30,35 +30,18 @@ let fruits = [];
 let score = 0;
 let lives = 3;
 let mouseTrail = [];
-
-const fruitTypes = [
-  { name: 'apple', src: 'images/apple.png' },
-  { name: 'banana', src: 'images/banana.png' },
-  { name: 'orange', src: 'images/orange.png' },
-  { name: 'watermelon', src: 'images/watermelon.png' }
-];
-
-// Preload fruit images
-const fruitImages = {};
-fruitTypes.forEach(fruit => {
-  const img = new Image();
-  img.src = fruit.src;
-  fruitImages[fruit.name] = img;
-});
+const fruitColors = ['red', 'yellow', 'green', 'orange', 'purple'];
 
 class Fruit {
-  constructor(name, x, y, vx, vy) {
-    this.name = name;
-    this.image = fruitImages[name];
+  constructor(x, y, radius, color, vx, vy) {
     this.x = x;
     this.y = y;
+    this.radius = radius;
+    this.color = color;
     this.vx = vx;
     this.vy = vy;
     this.gravity = 0.5;
-    this.radius = 40; // for slicing detection
     this.sliced = false;
-    this.width = 60;
-    this.height = 60;
   }
 
   update() {
@@ -68,28 +51,25 @@ class Fruit {
   }
 
   draw() {
-    if (!this.sliced && this.image.complete) {
-      ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-    } else if (this.sliced) {
-      // Optional: gray overlay to show it's sliced
-      ctx.globalAlpha = 0.5;
-      ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-      ctx.globalAlpha = 1;
-    }
+    ctx.beginPath();
+    ctx.fillStyle = this.sliced ? 'gray' : this.color;
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   isOffScreen() {
-    return this.y - this.height > canvas.height;
+    return this.y - this.radius > canvas.height;
   }
 }
 
 function spawnFruit() {
-  const type = fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
-  const x = Math.random() * (canvas.width - 100) + 50;
-  const y = canvas.height + 50;
-  const vx = (Math.random() - 0.5) * 10;
+  const radius = 30;
+  const x = Math.random() * (canvas.width - 2 * radius) + radius;
+  const y = canvas.height + radius;
+  const vx = (Math.random() - 0.5) * 8;
   const vy = -15 - Math.random() * 10;
-  fruits.push(new Fruit(type.name, x, y, vx, vy));
+  const color = fruitColors[Math.floor(Math.random() * fruitColors.length)];
+  fruits.push(new Fruit(x, y, radius, color, vx, vy));
 }
 
 function detectSlice() {
