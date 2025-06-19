@@ -58,11 +58,91 @@
         let mouseTrail = [];
 
         const fruitTypes = [
-            { name: "apple", src: "images/a1.webp" },
-            { name: "banana", src: "images/a2.webp" },
-            { name: "orange", src: "images/a3.webp" },
-            { name: "watermelon", src: "images/a4.webp" },
-            { name: "pineapple", src: "images/a5.webp" },
+            { name: "a1", src: "images/a1.webp" },
+            { name: "a2", src: "images/a2.webp" },
+            { name: "a3", src: "images/a3.webp" },
+            { name: "a4", src: "images/a4.webp" },
+            { name: "a5", src: "images/a5.webp" },
+            {
+                name: "a6",
+                src: "images/a6.webp"
+            },
+            {
+                name: "a7",
+                src: "images/a7.webp"
+            },
+            {
+                name: "a8",
+                src: "images/a8.webp"
+            },
+            {
+                name: "a9",
+                src: "images/a9.webp"
+            },
+            {
+                name: "a10",
+                src: "images/a10.webp"
+            },
+            {
+                name: "a11",
+                src: "images/a11.webp"
+            },
+            {
+                name: "a12",
+                src: "images/a12.webp"
+            },
+            {
+                name: "a13",
+                src: "images/a13.webp"
+            },
+            {
+                name: "a14",
+                src: "images/a14.webp"
+            },
+            {
+                name: "a15",
+                src: "images/a15.webp"
+            },
+            {
+                name: "a16",
+                src: "images/a16.webp"
+            },
+            {
+                name: "a17",
+                src: "images/a17.webp"
+            },
+            {
+                name: "a18",
+                src: "images/a18.webp"
+            },
+            {
+                name: "a19",
+                src: "images/a19.webp"
+            },
+            {
+                name: "a20",
+                src: "images/a20.webp"
+            },
+            {
+                name: "a21",
+                src: "images/a21.webp"
+            },
+            {
+                name: "a22",
+                src: "images/a22.webp"
+            },
+            {
+                name: "a23",
+                src: "images/a23.webp"
+            },
+            {
+                name: "a24",
+                src: "images/a24.webp"
+            },
+            {
+                name: "a25",
+                src: "images/a25.webp"
+            }
         ];
 
         const fruitImages = {};
@@ -152,20 +232,20 @@
                 // Always draw the fruit image
                 ctx.drawImage(this.image, x, y, this.width, this.height);
 
-                    // If sliced, overlay flickering tint
-                    if (this.sliced) {
-                        this.flickerFrame++;
+                // If sliced, overlay flickering tint
+                if (this.sliced) {
+                    this.flickerFrame++;
 
-                        // Alternate between red and purple
-                        const isRed = this.flickerFrame % 10 < 5;
-                        const color = isRed ? 'rgba(255, 0, 0, 0.5)' : 'rgba(128, 0, 128, 0.5)';
+                    // Alternate between red and purple
+                    const isRed = this.flickerFrame % 10 < 5;
+                    const color = isRed ? 'rgba(255, 0, 0, 0.5)' : 'rgba(128, 0, 128, 0.5)';
 
-                        ctx.globalCompositeOperation = 'source-atop';
-                        ctx.fillStyle = color;
-                        ctx.fillRect(x, y, this.width, this.height);
-                        ctx.globalCompositeOperation = 'source-over';
-                    }
+                    ctx.globalCompositeOperation = 'source-atop';
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x, y, this.width, this.height);
+                    ctx.globalCompositeOperation = 'source-over';
                 }
+            }
 
 
             isOffScreen() {
