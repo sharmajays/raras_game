@@ -1,228 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Happy Bday Raras</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: #111;
-    }
-    canvas {
-      display: block;
-      background: #222;
-      cursor: none;
-    }
-    #scoreboard {
-      position: absolute;
-      color: white;
-      font-family: Arial, sans-serif;
-      font-size: calc(16px + 1.5vw); /* Responsive font */
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>Happy Bday Raras</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #111;
+        }
+
+        canvas {
+            display: block;
+            background: #222;
+            cursor: none;
+        }
+
+        #scoreboard {
+            position: absolute;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: calc(16px + 1.5vw);
+            /* Responsive font */
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+        }
+    </style>
 </head>
+
 <body>
-  <canvas id="game"></canvas>
-  <p>hello</p>
-  <div id="scoreboard">Score: 0 | Lives: 100 </div>
-  <img id="knifeCursor" src="images/cur.png" style="position:absolute; width:60px; height:60px; pointer-events:none; display:none; z-index:999;" />
+    <canvas id="game"></canvas>
+    <p>hello</p>
+    <div id="scoreboard">Score: 0 | Lives: 100</div>
+    <img id="knifeCursor" src="images/cur.png" style="
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        pointer-events: none;
+        display: none;
+        z-index: 999;
+      " />
 
+    <script>
+        const canvas = document.getElementById("game");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-  <script>
-    const canvas = document.getElementById('game');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+        const knifeCursor = document.getElementById("knifeCursor");
+        const sliceSound = new Audio("images/success.mp3");
+        let audioUnlocked = false;
 
-    const knifeCursor = document.getElementById('knifeCursor');
-    const sliceSound = new Audio('images/success.mp3');
-
-    function playSliceSound() {
-        const sound = sliceSound.cloneNode();
-        sound.play();
-    }
-
-    let fruits = [];
-    let score = 0;
-    let lives = 100;
-    let mouseTrail = [];
-
-    const fruitTypes = [
-      { name: 'apple', src: 'images/a1.webp' },
-      { name: 'banana', src: 'images/a2.webp' },
-      { name: 'orange', src: 'images/a3.webp' },
-      { name: 'watermelon', src: 'images/a4.webp' },
-      { name: 'pineapple', src: 'images/a5.webp' }
-    ];
-
-    const fruitImages = {};
-    let loadedImages = 0;
-
-    fruitTypes.forEach(fruit => {
-      const img = new Image();
-      img.src = fruit.src;
-      img.onload = () => {
-        loadedImages++;
-        if (loadedImages === fruitTypes.length) {
-          // Start game when all images are ready
-          setInterval(spawnFruit, 1000);
-          animate();
+        function unlockAudio() {
+            if (!audioUnlocked) {
+                sliceSound.play().catch(() => { }); // unlock silently
+                audioUnlocked = true;
+                alert("yes")
+                document.removeEventListener('click', unlockAudio);
+                document.removeEventListener('touchstart', unlockAudio);
+            }
         }
-      };
-      img.onerror = () => console.error(`Failed to load image: ${fruit.src}`);
-      fruitImages[fruit.name] = img;
-    });
 
-    class Fruit {
-      constructor(name, x, y, vx, vy) {
-        this.name = name;
-        this.image = fruitImages[name];
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-        this.gravity = 0.5;
-        this.sliced = false;
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('touchstart', unlockAudio);
 
-        // Scale based on screen size
-        const scale = window.innerWidth < 768 ? 1.5 : 1;
-        this.width = 60 * scale;
-        this.height = 60 * scale;
-        this.radius = 40 * scale;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vy += this.gravity;
-      }
-
-      draw() {
-        if (!this.image.complete) return;
-        ctx.globalAlpha = this.sliced ? 0.5 : 1;
-        ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-        ctx.globalAlpha = 1;
-      }
-
-      isOffScreen() {
-        return this.y - this.height > canvas.height;
-      }
-    }
-
-    function updateKnifeCursor(x, y) {
-        knifeCursor.style.left = `${(x - 20)}px`;
-        knifeCursor.style.top = `${(y - 20)}px`;
-        knifeCursor.style.display = 'block';
-    }
-
-    function spawnFruit() {
-      const type = fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
-      const x = Math.random() * (canvas.width - 100) + 50;
-      const y = canvas.height + 50;
-      const vx = (Math.random() - 0.5) * 10;
-      const vy = -15 - Math.random() * 10;
-      fruits.push(new Fruit(type.name, x, y, vx, vy));
-    }
-
-    function detectSlice() {
-      for (let fruit of fruits) {
-        if (fruit.sliced) continue;
-        for (let i = 0; i < mouseTrail.length - 1; i++) {
-          const dx = fruit.x - mouseTrail[i].x;
-          const dy = fruit.y - mouseTrail[i].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < fruit.radius) {
-            playSliceSound()            
-            fruit.sliced = true;
-            score++;
-            updateScoreboard();
-            break;
-          }
+        // When slicing:
+        function playSliceSound() {
+            console.log("I WAS HERE, ",audioUnlocked)
+            if (audioUnlocked) {
+                const sound = sliceSound.cloneNode();
+                sound.play().then(()=>console.log("played")).catch((err) => { 
+                    alert(err)
+                }); // avoid future promise rejections
+            }
         }
-      }
-    }
 
-    function updateScoreboard() {
-      document.getElementById('scoreboard').innerText = `Score: ${score} | Lives: ${lives}`;
-    }
+        let fruits = [];
+        let score = 0;
+        let lives = 100;
+        let mouseTrail = [];
 
-    function gameOver() {
-      alert(`Game Over! Your score: ${score}`);
-      window.location.reload();
-    }
+        const fruitTypes = [
+            { name: "apple", src: "images/a1.webp" },
+            { name: "banana", src: "images/a2.webp" },
+            { name: "orange", src: "images/a3.webp" },
+            { name: "watermelon", src: "images/a4.webp" },
+            { name: "pineapple", src: "images/a5.webp" },
+        ];
 
-    function drawMouseTrail() {
-      ctx.beginPath();
-      const trailWidth = window.innerWidth < 768 ? 1 : 2;
-      ctx.lineWidth = trailWidth;
-      ctx.strokeStyle = 'white';
-      for (let i = 0; i < mouseTrail.length - 1; i++) {
-        ctx.moveTo(mouseTrail[i].x, mouseTrail[i].y);
-        ctx.lineTo(mouseTrail[i + 1].x, mouseTrail[i + 1].y);
-      }
-      ctx.stroke();
-    }
+        const fruitImages = {};
+        let loadedImages = 0;
 
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+        fruitTypes.forEach((fruit) => {
+            const img = new Image();
+            img.src = fruit.src;
+            img.onload = () => {
+                loadedImages++;
+                if (loadedImages === fruitTypes.length) {
+                    // Start game when all images are ready
+                    setInterval(spawnFruit, 1000);
+                    animate();
+                }
+            };
+            img.onerror = () => console.error(`Failed to load image: ${fruit.src}`);
+            fruitImages[fruit.name] = img;
+        });
 
-      fruits.forEach(fruit => {
-        fruit.update();
-        fruit.draw();
-      });
+        class Fruit {
+            constructor(name, x, y, vx, vy) {
+                this.name = name;
+                this.image = fruitImages[name];
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.gravity = 0.5;
+                this.sliced = false;
 
-      detectSlice();
+                // Scale based on screen size
+                const scale = window.innerWidth < 768 ? 1.5 : 1;
+                this.width = 60 * scale;
+                this.height = 60 * scale;
+                this.radius = 40 * scale;
+            }
 
-      fruits = fruits.filter(fruit => {
-        if (!fruit.sliced && fruit.isOffScreen()) {
-          lives--;
-          updateScoreboard();
-          if (lives <= 0) gameOver();
-          return false;
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity;
+            }
+
+            draw() {
+                if (!this.image.complete) return;
+                ctx.globalAlpha = this.sliced ? 0.5 : 1;
+                ctx.drawImage(
+                    this.image,
+                    this.x - this.width / 2,
+                    this.y - this.height / 2,
+                    this.width,
+                    this.height
+                );
+                ctx.globalAlpha = 1;
+            }
+
+            isOffScreen() {
+                return this.y - this.height > canvas.height;
+            }
         }
-        return !fruit.sliced || (fruit.sliced && fruit.y < canvas.height + 50);
-      });
 
-      drawMouseTrail();
-      requestAnimationFrame(animate);
-    }
+        function updateKnifeCursor(x, y) {
+            knifeCursor.style.left = `${x - 20}px`;
+            knifeCursor.style.top = `${y - 20}px`;
+            knifeCursor.style.display = "block";
+        }
 
-    function trackMovement(x, y) {
-      mouseTrail.push({ x, y });
-      if (mouseTrail.length > 10) mouseTrail.shift();
-    }
+        function spawnFruit() {
+            const type = fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
+            const x = Math.random() * (canvas.width - 100) + 50;
+            const y = canvas.height + 50;
+            const vx = (Math.random() - 0.5) * 10;
+            const vy = -15 - Math.random() * 10;
+            fruits.push(new Fruit(type.name, x, y, vx, vy));
+        }
 
-    // Mouse support
-    canvas.addEventListener('mousemove', e => {
-      trackMovement(e.clientX, e.clientY);
-      updateKnifeCursor(e.clientX, e.clientY);
-    });
+        function detectSlice() {
+            for (let fruit of fruits) {
+                if (fruit.sliced) continue;
+                for (let i = 0; i < mouseTrail.length - 1; i++) {
+                    const dx = fruit.x - mouseTrail[i].x;
+                    const dy = fruit.y - mouseTrail[i].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < fruit.radius) {
+                        fruit.sliced = true;
+                        playSliceSound()
+                        score++;
+                        updateScoreboard();
+                        break;
+                    }
+                }
+            }
+        }
 
-    canvas.addEventListener('mouseleave', () => {
-      mouseTrail = [];
-      knifeCursor.style.display = 'none';
-    });
+        function updateScoreboard() {
+            document.getElementById(
+                "scoreboard"
+            ).innerText = `Score: ${score} | Lives: ${lives}`;
+        }
 
-    // Touch support
-    canvas.addEventListener('touchmove', e => {
-      const touch = e.touches[0];
-      if (touch) {
-        trackMovement(touch.clientX, touch.clientY);
-        updateKnifeCursor(touch.clientX, touch.clientY);
-      }
-      e.preventDefault();
-    }, { passive: false });
+        function gameOver() {
+            alert(`Game Over! Your score: ${score}`);
+            window.location.reload();
+        }
 
-    canvas.addEventListener('touchend', () => {
-      mouseTrail = [];
-      knifeCursor.style.display = 'none';
-    });
+        function drawMouseTrail() {
+            ctx.beginPath();
+            const trailWidth = window.innerWidth < 768 ? 1 : 2;
+            ctx.lineWidth = trailWidth;
+            ctx.strokeStyle = "white";
+            for (let i = 0; i < mouseTrail.length - 1; i++) {
+                ctx.moveTo(mouseTrail[i].x, mouseTrail[i].y);
+                ctx.lineTo(mouseTrail[i + 1].x, mouseTrail[i + 1].y);
+            }
+            ctx.stroke();
+        }
 
-  </script>
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            fruits.forEach((fruit) => {
+                fruit.update();
+                fruit.draw();
+            });
+
+            detectSlice();
+
+            fruits = fruits.filter((fruit) => {
+                if (!fruit.sliced && fruit.isOffScreen()) {
+                    lives--;
+                    updateScoreboard();
+                    if (lives <= 0) gameOver();
+                    return false;
+                }
+                return (
+                    !fruit.sliced || (fruit.sliced && fruit.y < canvas.height + 50)
+                );
+            });
+
+            drawMouseTrail();
+            requestAnimationFrame(animate);
+        }
+
+        function trackMovement(x, y) {
+            mouseTrail.push({ x, y });
+            if (mouseTrail.length > 10) mouseTrail.shift();
+        }
+
+        // Mouse support
+        canvas.addEventListener("mousemove", (e) => {
+            trackMovement(e.clientX, e.clientY);
+            updateKnifeCursor(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener("mouseleave", () => {
+            mouseTrail = [];
+            knifeCursor.style.display = "none";
+        });
+
+        // Touch support
+        canvas.addEventListener(
+            "touchmove",
+            (e) => {
+                const touch = e.touches[0];
+                if (touch) {
+                    trackMovement(touch.clientX, touch.clientY);
+                    updateKnifeCursor(touch.clientX, touch.clientY);
+                }
+                e.preventDefault();
+            },
+            { passive: false }
+        );
+
+        canvas.addEventListener("touchend", () => {
+            mouseTrail = [];
+            knifeCursor.style.display = "none";
+        });
+    </script>
 </body>
+
 </html>
