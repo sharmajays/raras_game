@@ -107,18 +107,40 @@
                 this.vy += this.gravity;
             }
 
+            // draw() {
+            //     if (!this.image.complete) return;
+            //     ctx.globalAlpha = this.sliced ? 0.5 : 1;
+            //     ctx.drawImage(
+            //         this.image,
+            //         this.x - this.width / 2,
+            //         this.y - this.height / 2,
+            //         this.width,
+            //         this.height
+            //     );
+            //     ctx.globalAlpha = 1;
+            // }
+
             draw() {
                 if (!this.image.complete) return;
-                ctx.globalAlpha = this.sliced ? 0.5 : 1;
-                ctx.drawImage(
-                    this.image,
-                    this.x - this.width / 2,
-                    this.y - this.height / 2,
-                    this.width,
-                    this.height
-                );
-                ctx.globalAlpha = 1;
+
+                const x = this.x - this.width / 2;
+                const y = this.y - this.height / 2;
+
+                if (this.sliced) {
+                    // Draw normal image
+                    ctx.drawImage(this.image, x, y, this.width, this.height);
+
+                    // Apply red tint
+                    ctx.globalCompositeOperation = 'source-atop';
+                    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; // red overlay
+                    ctx.fillRect(x, y, this.width, this.height);
+                    ctx.globalCompositeOperation = 'source-over';
+                } else {
+                    // Normal image
+                    ctx.drawImage(this.image, x, y, this.width, this.height);
+                }
             }
+
 
             isOffScreen() {
                 return this.y - this.height > canvas.height;
