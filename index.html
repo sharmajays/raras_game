@@ -83,22 +83,6 @@
             fruitImages[fruit.name] = img;
         });
 
-        function playBeep() {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = ctx.createOscillator();
-            const gain = ctx.createGain();
-
-            oscillator.type = 'square';         // or 'sine', 'triangle', etc.
-            oscillator.frequency.setValueAtTime(600, ctx.currentTime); // frequency in Hz
-
-            oscillator.connect(gain);
-            gain.connect(ctx.destination);
-
-            gain.gain.setValueAtTime(0.2, ctx.currentTime); // volume
-            oscillator.start();
-            oscillator.stop(ctx.currentTime + 0.1); // beep duration: 0.1s
-        }
-
         class Fruit {
             constructor(name, x, y, vx, vy) {
                 this.name = name;
@@ -193,6 +177,22 @@
             knifeCursor.style.left = `${x - 20}px`;
             knifeCursor.style.top = `${y - 20}px`;
             knifeCursor.style.display = "block";
+        }
+
+        function playBeep() {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            oscillator.type = 'square';         // or 'sine', 'triangle', etc.
+            oscillator.frequency.setValueAtTime(600, ctx.currentTime); // frequency in Hz
+
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
+
+            gain.gain.setValueAtTime(0.2, ctx.currentTime); // volume
+            oscillator.start();
+            oscillator.stop(ctx.currentTime + 0.1); // beep duration: 0.1s
         }
 
         function spawnFruit() {
