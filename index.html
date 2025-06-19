@@ -30,7 +30,7 @@
   <canvas id="game"></canvas>
   <p>hello</p>
   <div id="scoreboard">Score: 0 | Lives: 100 </div>
-  <img id="knifeCursor" src="images/cur.png" style="position:absolute; width:40px; height:40px; pointer-events:none; display:none; z-index:999;" />
+  <img id="knifeCursor" src="images/cur.png" style="position:absolute; width:60px; height:60px; pointer-events:none; display:none; z-index:999;" />
 
 
   <script>
@@ -109,8 +109,8 @@
     }
 
     function updateKnifeCursor(x, y) {
-        knifeCursor.style.left = `${x - 20}px`;
-        knifeCursor.style.top = `${y - 20}px`;
+        knifeCursor.style.left = `${(x - 20)}px`;
+        knifeCursor.style.top = `${(y - 20)}px`;
         knifeCursor.style.display = 'block';
     }
 
