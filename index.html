@@ -183,8 +183,8 @@
             const type = fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
             const x = Math.random() * (canvas.width - 100) + 50;
             const y = canvas.height + 50;
-            const vx = (Math.random() - 0.5) * 5;
-            const vy = -15 - Math.random() * 5;
+            const vx = (Math.random() - 0.5) * 3;
+            const vy = -15 - Math.random() * 3;
             fruits.push(new Fruit(type.name, x, y, vx, vy));
         }
 
