@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fruit Cut Game with Images</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #111; }
+    canvas { display: block; background: #222; }
+    #scoreboard {
+      position: absolute;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      top: 10px;
+      left: 10px;
+    }
+  </style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="scoreboard">Score: 0 | Lives: 3</div>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let fruits = [];
+let score = 0;
+let lives = 3;
+let mouseTrail = [];
+
+const fruitTypes = [
+  { name: 'apple', src: 'images/apple.png' },
+  { name: 'banana', src: 'images/banana.png' },
+  { name: 'orange', src: 'images/orange.png' },
+  { name: 'watermelon', src: 'images/watermelon.png' }
+];
+
+// Preload fruit images
+const fruitImages = {};
+fruitTypes.forEach(fruit => {
+  const img = new Image();
+  img.src = fruit.src;
+  fruitImages[fruit.name] = img;
+});
+
+class Fruit {
+  constructor(name, x, y, vx, vy) {
+    this.name = name;
+    this.image = fruitImages[name];
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.gravity = 0.5;
+    this.radius = 40; // for slicing detection
+    this.sliced = false;
+    this.width = 60;
+    this.height = 60;
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += this.gravity;
+  }
+
+  draw() {
+    if (!this.sliced && this.image.complete) {
+      ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+    } else if (this.sliced) {
+      // Optional: gray overlay to show it's sliced
+      ctx.globalAlpha = 0.5;
+      ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  isOffScreen() {
+    return this.y - this.height > canvas.height;
+  }
+}
+
+function spawnFruit() {
+  const type = fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
+  const x = Math.random() * (canvas.width - 100) + 50;
+  const y = canvas.height + 50;
+  const vx = (Math.random() - 0.5) * 10;
+  const vy = -15 - Math.random() * 10;
+  fruits.push(new Fruit(type.name, x, y, vx, vy));
+}
+
+function detectSlice() {
+  for (let i = 0; i < fruits.length; i++) {
+    const fruit = fruits[i];
+    if (fruit.sliced) continue;
+
+    for (let j = 0; j < mouseTrail.length - 1; j++) {
+      const dx = fruit.x - mouseTrail[j].x;
+      const dy = fruit.y - mouseTrail[j].y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < fruit.radius) {
+        fruit.sliced = true;
+        score++;
+        updateScoreboard();
+        break;
+      }
+    }
+  }
+}
+
+function updateScoreboard() {
+  document.getElementById('scoreboard').innerText = `Score: ${score} | Lives: ${lives}`;
+}
+
+function gameOver() {
+  alert(`Game Over! Your score: ${score}`);
+  window.location.reload();
+}
+
+function drawMouseTrail() {
+  ctx.beginPath();
+  for (let i = 0; i < mouseTrail.length - 1; i++) {
+    const p1 = mouseTrail[i];
+    const p2 = mouseTrail[i + 1];
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 3;
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+  }
+  ctx.stroke();
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  fruits.forEach(fruit => {
+    fruit.update();
+    fruit.draw();
+  });
+
+  detectSlice();
+
+  fruits = fruits.filter(fruit => {
+    if (!fruit.sliced && fruit.isOffScreen()) {
+      lives--;
+      updateScoreboard();
+      if (lives <= 0) gameOver();
+      return false;
+    }
+    return !fruit.sliced || (fruit.sliced && fruit.y < canvas.height + 50);
+  });
+
+  drawMouseTrail();
+  requestAnimationFrame(animate);
+}
+
+setInterval(spawnFruit, 1000);
+animate();
+
+canvas.addEventListener('mousemove', e => {
+  mouseTrail.push({ x: e.clientX, y: e.clientY });
+  if (mouseTrail.length > 10) mouseTrail.shift();
+});
+
+canvas.addEventListener('mouseleave', () => {
+  mouseTrail = [];
+});
+</script>
+</body>
+</html>
